@@ -104,10 +104,10 @@
         }
 
         .avatar-circle {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background: #242424;
+            background: #1f1f1f;
             margin: 0 auto 15px;
             display: flex;
             justify-content: center;
@@ -120,6 +120,7 @@
         .avatar-circle svg {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
         .player-role {
@@ -226,8 +227,8 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9);
             justify-content: center;
-            align-items: center;
-            z-index: 100;}
+            align-items: center;z-index: 100;
+        }
 
         .modal-content {
             background: #141414;
@@ -269,11 +270,11 @@
         <div class="editor-layout">
             <div class="editor-preview">
                 <div id="editor-avatar-view" class="avatar-circle"></div>
-                <p style="color:#aaa; margin-top:10px;">Ваш живой аватар</p>
+                <p style="color:#aaa; margin-top:10px;">Реалистичный векторный портрет</p>
             </div>
             <div class="editor-options">
                 <label>Напишите никнейм или фамилию:</label>
-                <input type="text" id="input-nickname" placeholder="Например: Дон Карлеоне" value="Игрок" oninput="previewCharacter()">
+                <input type="text" id="input-nickname" placeholder="Например: Дон Сальери" value="Игрок" oninput="previewCharacter()">
 
                 <div class="option-group">
                     <label>Пол:</label>
@@ -294,29 +295,29 @@
                         <label for="beard-no">Нет</label>
                     </div>
                     <select id="select-beard-style" style="margin-top:10px;" onchange="previewCharacter()">
-                        <option value="beard1">Густая борода</option>
-                        <option value="beard2">Тонкие усы гангстера</option>
-                        <option value="beard3">Легкая щетина</option>
+                        <option value="beard1">Легкая бородка и усы</option>
+                        <option value="beard2">Тонкие мафиози-усы</option>
+                        <option value="beard3">Суровая щетина</option>
                     </select>
                 </div>
 
                 <div class="option-group">
-                    <label>Причёска (Любые 5):</label>
+                    <label>Причёска:</label>
                     <select id="select-hair" onchange="previewCharacter()">
-                        <option value="hair1">Зализ назад (Стиль 1)</option>
-                        <option value="hair2">Шляпа Дона (Стиль 2)</option>
-                        <option value="hair3">Классический пробор (Стиль 3)</option>
-                        <option value="hair4">Каре/Длинные (Стиль 4)</option>
-                        <option value="hair5">Лысый нуар (Стиль 5)</option>
+                        <option value="hair1">Стильный зализ назад (Как на фото)</option>
+                        <option value="hair2">Классическая короткая</option>
+                        <option value="hair3">Пробор в сторону</option>
+                        <option value="hair4">Объемная стрижка</option>
+                        <option value="hair5">Лысый Брутал</option>
                     </select>
                 </div>
 
                 <div class="option-group">
                     <label>Одежда:</label>
                     <select id="select-clothes" onchange="previewCharacter()">
-                        <option value="suit1">Черный Смокинг</option>
-                        <option value="suit2">Пальто мафиози</option>
-                        <option value="suit3">Красный пиджак</option>
+                        <option value="suit1">Строгий черный костюм</option>
+                        <option value="suit2">Темно-серый пиджак</option>
+                        <option value="suit3">Бордовый смокинг</option>
                     </select>
                 </div>
 
@@ -340,7 +341,7 @@
         <div id="game-info" class="game-status">Нажмите кнопку «Распределить роли», чтобы начать партию.</div>
         
         <div class="players-list" id="players-container">
-            <!-- Сюда JavaScript добавит карточки игроков и ботов -->
+            <!-- JavaScript генерирует карточки сюда -->
         </div>
 
         <div class="game-controls">
@@ -349,18 +350,17 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО СМЕРТИ / КОНЦА ИГРЫ -->
+    <!-- МОДАЛЬНОЕ ОКНО -->
     <div id="game-modal" class="modal">
         <div class="modal-content">
             <h2 id="modal-title">Вы выбыли!</h2>
-            <p id="modal-text">К сожалению, этой ночью вас устранили.</p>
+            <p id="modal-text">Вас убрали из игры.</p>
             <div class="modal-buttons">
                 <button onclick="closeModalAndGoMenu()">В главное меню</button>
                 <button onclick="continueAsSpectator()" id="btn-spectate">Смотреть остаток</button>
             </div>
         </div>
     </div><script>
-        // Конфиг твоего персонажа (по умолчанию или из памяти браузера)
         let playerConfig = JSON.parse(localStorage.getItem('mafia_player')) || {
             nickname: "Дон Карлеоне",
             gender: "М",
@@ -380,52 +380,80 @@
         const botNames = ["Луиджи", "Бруно", "Сальери", "Тони", "Вито", "Сэм", "Поли", "Фрэнк"];
         const rolesPool = ["Мафия", "Шериф", "Доктор", "Мирный житель", "Мирный житель"];
 
-        // Функция рисования реального лица (модульный SVG)
+        // Генерация высокодетализированного мужского лица (стиль реалистичного векторного арта)
         function generateFaceSVG(hair, beardStyle, hasBeard, clothes, isBot = false, botSeed = 1) {
-            let skinColor = "#fbe3d5"; // Всегда белый/светлый тон кожи для всех персонажей
-            let hairColor = isBot ? (botSeed % 2 === 0 ? "#5a3d28" : "#222222") : "#1c1c1c";
-            let suitColor = clothes === "suit1" ? "#1a1a1a" : (clothes === "suit2" ? "#3a4d5c" : "#8b1a1a");
+            let skin = "#f3ccb6"; 
+            let shadowSkin = "#dfa687"; 
+            let hairColor = isBot ? (botSeed % 2 === 0 ? "#3b2314" : "#1a1a1a") : "#151515";
+            let suitColor = clothes === "suit1" ? "#1a1a1a" : (clothes === "suit2" ? "#3a3a3a" : "#5b1111");
             
-            // Если это бот — делаем ему случайные комбинации
             if (isBot) {
-                hair = ["hair1", "hair3", "hair4", "hair5"][botSeed % 4];
-                hasBeard = botSeed % 3 === 0 ? "есть" : "нет";
+                hair = ["hair1", "hair2", "hair3", "hair5"][botSeed % 4];
+                hasBeard = botSeed % 2 === 0 ? "есть" : "нет";
                 beardStyle = ["beard1", "beard2", "beard3"][botSeed % 3];
-                suitColor = ["#222", "#445566", "#334433"][botSeed % 3];
+                suitColor = ["#1e1e1e", "#2c3e50", "#4a1212"][botSeed % 3];
             }
 
-            // Слои лица (Глаза, Нос, Рот, Уши)
-            let eyes = '<circle cx="40" cy="45" r="3.5" fill="#111"/><circle cx="60" cy="45" r="3.5" fill="#111"/>';
-            let eyebrows = `<path d="M33 39 Q40 36 47 40" stroke="${hairColor}" stroke-width="2.5" fill="none"/><path d="M67 39 Q60 36 53 40" stroke="${hairColor}" stroke-width="2.5" fill="none"/>`;
-            let nose = '<path d="M50 43 L47 55 L53 55 Z" fill="#e2bfa7"/>';
-            let mouth = '<path d="M42 68 Q50 72 58 68" stroke="#aa5555" stroke-width="2" fill="none"/>';
-            
-            // Слой бороды
+            // Анатомия лица (Форма головы со скулами, уши, тени)
+            let baseHead = `
+                <path d="M25 45 Q22 55 25 62 Q28 78 50 84 Q72 78 75 62 Q78 55 75 45 Q75 30 50 28 Q25 30 25 45 Z" fill="${skin}"/>
+                <path d="M50 28 Q75 30 75 45 Q75 55 72 65 Q65 78 50 84 Z" fill="${shadowSkin}" opacity="0.25"/> <!-- Светотень -->
+                <circle cx="21" cy="54" r="6" fill="${skin}"/><circle cx="79" cy="54" r="6" fill="${skin}"/>
+            `;
+
+            // Реалистичные полуприкрытые глаза мафиози
+            let eyes = `
+                <path d="M32 48 Q40 43 47 48 Q40 51 32 48 Z" fill="#fff" stroke="#442211" stroke-width="0.5"/>
+                <circle cx="39.5" cy="47.5" r="3" fill="#2c3e50"/><circle cx="39.5" cy="47.5" r="1.2" fill="#000"/>
+                <path d="M53 48 Q60 43 68 48 Q60 51 53 48 Z" fill="#fff" stroke="#442211" stroke-width="0.5"/>
+                <circle cx="60.5" cy="47.5" r="3" fill="#2c3e50"/><circle cx="60.5" cy="47.5" r="1.2" fill="#000"/>
+                <path d="M30 46 Q40 41 48 45" stroke="#111" stroke-width="1.5" fill="none"/> <!-- Веки -->
+                <path d="M52 46 Q60 41 70 45" stroke="#111" stroke-width="1.5" fill="none"/>
+            `;
+
+            let eyebrows = `
+                <path d="M28 41 Q38 36 46 41" stroke="${hairColor}" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <path d="M72 41 Q62 36 54 41" stroke="${hairColor}" stroke-width="3" stroke-linecap="round" fill="none"/>
+            `;
+
+            let nose = `
+                <path d="M47 43 L45 58 Q50 62 55 58 L53 43 Z" fill="${shadowSkin}" opacity="0.4"/>
+                <path d="M47 58 Q50 61 53 58" stroke="#b88365" stroke-width="1.5" fill="none"/>
+            `;
+
+            let mouth = '<path d="M38 68 Q50 71 62 68" stroke="#9e564d" stroke-width="2" fill="none"/><path d="M43 68 L57 68" stroke="#4a1515" stroke-width="1" fill="none"/>';
+
+            // Прически (Стильный зализ с объемом и текстурой, проборы)
+            let hairSVG = '';
+            if (hair === "hair1") hairSVG = `<path d="M23 42 Q50 8 77 42 C72 20 28 20 23 42 Z" fill="${hairColor}"/><path d="M30 26 Q50 16 65 24" stroke="#444" stroke-width="1" fill="none"/>`; 
+            if (hair === "hair2") hairSVG = `<path d="M24 42 Q50 20 76 42 C74 28 26 28 24 42 Z" fill="${hairColor}"/>`; 
+            if (hair === "hair3") hairSVG = `<path d="M23 42 Q35 15 52 24 Q75 18 77 42 C70 24 45 28 23 42 Z" fill="${hairColor}"/>`;if (hair === "hair4") hairSVG = `<path d="M22 44 Q50 12 78 44 L81 58 L74 54 Q50 30 26 54 L19 58 Z" fill="${hairColor}"/>`;
+            if (hair === "hair5") hairSVG = `<path d="M25 35 Q50 25 75 35" stroke="${shadowSkin}" stroke-width="2" fill="none"/>`; // Лысый (тени)
+
+            // Бороды и усы
             let beardSVG = '';
             if (hasBeard === "есть") {
-                if (beardStyle === "beard1") beardSVG = `<path d="M30 55 Q50 85 70 55 Q73 72 65 82 Q50 92 35 82 Q27 72 30 55" fill="${hairColor}"/>`;
-                if (beardStyle === "beard2") beardSVG = `<path d="M40 61 Q50 58 60 61 Q50 64 40 61" fill="${hairColor}"/>`; // Усы
-                if (beardStyle === "beard3") beardSVG = `<path d="M30 55 Q50 83 70 55" stroke="#777" stroke-width="4" stroke-dasharray="2" fill="none"/>`; // Щетина
+                if (beardStyle === "beard1") beardSVG = `<path d="M25 58 Q50 94 75 58 Q77 75 66 86 Q50 99 34 86 Q23 75 25 58" fill="${hairColor}" opacity="0.95"/>`;
+                if (beardStyle === "beard2") beardSVG = `<path d="M36 62 Q50 56 64 62 Q50 67 36 62" fill="${hairColor}"/>`; 
+                if (beardStyle === "beard3") beardSVG = `<path d="M25 58 Q50 91 75 58" stroke="#555" stroke-width="4.5" stroke-dasharray="1,2" fill="none"/>`;
             }
 
-            // Слой прически
-            let hairSVG = '';
-            if (hair === "hair1") hairSVG = `<path d="M26 40 Q50 15 74 40 Q75 25 65 20 Q50 18 35 20 Q25 25 26 40" fill="${hairColor}"/>`; // Зализ
-            if (hair === "hair2") hairSVG = '<path d="M15 32 L85 32 L85 24 L15 24 Z" fill="#222"/><path d="M28 24 Q50 -5 72 24 Z" fill="#222"/>'; // Шляпа
-            if (hair === "hair3") hairSVG = `<path d="M26 38 Q50 12 74 38 C70 20 30 20 26 38" fill="${hairColor}"/>`; // Пробор
-            if (hair === "hair4") hairSVG = `<path d="M25 40 Q50 18 75 40 L78 65 L72 65 L70 42 Q50 25 30 42 L28 65 L22 65 Z" fill="${hairColor}"/>`; // Длинные
-            if (hair === "hair5") hairSVG = ''; // Лысый
-
-            // Одежда
-            let suitSVG = `<path d="M20 90 L80 90 L90 120 L100 150 L0 150 L10 120 Z" fill="${suitColor}"/><path d="M40 90 L50 115 L60 90 Z" fill="#fff"/><path d="M45 100 L55 100 L50 110 Z" fill="#000"/>`;
+            // Костюм, белоснежная рубашка и строгий галстук
+            let suitSVG = `
+                <path d="M10 88 L90 88 L105 125 L115 150 L-15 150 L-5 125 Z" fill="${suitColor}"/>
+                <path d="M34 88 L50 122 L66 88 Z" fill="#ffffff"/> <!-- Рубашка -->
+                <path d="M34 88 L46 102 L50 88 Z" fill="#ddd"/><path d="M66 88 L54 102 L50 88 Z" fill="#ddd"/> <!-- Воротник -->
+                <path d="M45 100 L55 100 L52 135 L48 135 Z" fill="#111"/> <!-- Галстук -->
+            `;
 
             return `
                 <svg viewBox="0 0 100 100" xmlns="http://w3.org">
-                    <circle cx="50" cy="50" r="50" fill="#1f1f1f"/> <!-- Фон карточки -->
-                    <circle cx="50" cy="53" r="28" fill="${skinColor}"/> <!-- Голова -->
+                    <circle cx="50" cy="50" r="49" fill="#181818" stroke="#333" stroke-width="1"/>
+                    ${baseHead}
                     ${eyebrows}
                     ${eyes}
-                    ${nose}${mouth}
+                    ${nose}
+                    ${mouth}
                     ${beardSVG}
                     ${hairSVG}
                     ${suitSVG}
@@ -433,10 +461,7 @@
             `;
         }
 
-        // Вызов отрисовки в редакторе при изменениях
         function previewCharacter() {
-            let nick = document.getElementById('input-nickname').value || "Игрок";
-            let gen = document.querySelector('input[name="gender"]:checked').value;
             let h = document.getElementById('select-hair').value;
             let bStyle = document.getElementById('select-beard-style').value;
             let hBeard = document.querySelector('input[name="beard"]:checked').value;
@@ -453,7 +478,6 @@
             playerConfig.hasBeard = document.querySelector('input[name="beard"]:checked').value;
             playerConfig.clothes = document.getElementById('select-clothes').value;
 
-            // Намертво сохраняем в локальную память браузера
             localStorage.setItem('mafia_player', JSON.stringify(playerConfig));
             applySavedCharacter();
             goToScreen('screen-menu');
@@ -463,7 +487,6 @@
             document.getElementById('menu-nickname').innerText = playerConfig.nickname;
             document.getElementById('menu-avatar').innerHTML = generateFaceSVG(playerConfig.hair, playerConfig.beard, playerConfig.hasBeard, playerConfig.clothes, false);
             
-            // Выставляем значения в полях редактора, чтобы они не сбрасывались при заходе
             document.getElementById('input-nickname').value = playerConfig.nickname;
             document.getElementById('select-hair').value = playerConfig.hair;
             document.getElementById('select-beard-style').value = playerConfig.beard;
@@ -473,12 +496,9 @@
             previewCharacter();
         }
 
-        // Запуск при старте страницы страницы
         window.onload = function() {
             applySavedCharacter();
-        };
-
-        function startOfflineGame() {
+        };function startOfflineGame() {
             goToScreen('screen-game');
             resetGame();
         }function resetGame() {
@@ -490,13 +510,13 @@
             document.getElementById('btn-action').style.display = "inline-block";
             document.getElementById('btn-next-phase').style.display = "none";
 
-            // Генерация 4 ботов с уникальными лицами (используем ID как seed)
+            // Сборка 5 участников с реалистичными лицами
             players = [
                 { id: 0, name: playerConfig.nickname, role: "", isBot: false, isAlive: true },
-                { id: 1, name: botNames[0], role: "", isBot: true, isAlive: true, seed: 11 },
-                { id: 2, name: botNames[1], role: "", isBot: true, isAlive: true, seed: 22 },
-                { id: 3, name: botNames[2], role: "", isBot: true, isAlive: true, seed: 33 },
-                { id: 4, name: botNames[3], role: "", isBot: true, isAlive: true, seed: 44 }
+                { id: 1, name: "Луиджи", role: "", isBot: true, isAlive: true, seed: 14 },
+                { id: 2, name: "Бруно", role: "", isBot: true, isAlive: true, seed: 27 },
+                { id: 3, name: "Тони", role: "", isBot: true, isAlive: true, seed: 39 },
+                { id: 4, name: "Вито", role: "", isBot: true, isAlive: true, seed: 52 }
             ];
             renderPlayers();
         }
@@ -515,7 +535,6 @@
                 if (!p.isBot && p.role) roleText = `Роль: ${p.role}`;
                 if (currentPhase === "game_over" || (!p.isAlive && p.isBot)) roleText = `Роль: ${p.role}`;
 
-                // Выбираем аватар: твой кастомный SVG или бот-генерация лица
                 let avatarSVG = p.isBot ? generateFaceSVG("", "", "", "", true, p.seed) : generateFaceSVG(playerConfig.hair, playerConfig.beard, playerConfig.hasBeard, playerConfig.clothes, false);
 
                 card.innerHTML = `
@@ -541,7 +560,7 @@
             if (currentPhase === "setup") {
                 shuffleRoles();
             } else if (currentPhase === "game_over") {
-                resetGame(); // Правильная полная перезагрузка при нажатии "Новая игра"
+                resetGame(); 
             }
         }
 
@@ -553,7 +572,7 @@
             }
             
             players.forEach((p, i) => { p.role = pool[i]; });
-            playerRole = players[0].role;
+            playerRole = players[0].role; // Исправлено: строго привязываемся к объекту игрока
 
             document.getElementById('btn-action').style.display = "none";
             document.getElementById('btn-next-phase').style.display = "inline-block";
@@ -562,15 +581,14 @@
         }
 
         function startNight() {
-            currentPhase = "night_sleep";document.getElementById('game-info').innerText = "Город засыпает... Нажмите кнопку пропуска фазы, чтобы проснулась Мафия.";
+            currentPhase = "night_sleep";
+            document.getElementById('game-info').innerText = "Город засыпает... Нажмите кнопку пропуска фазы, чтобы проснулась Мафия.";
             renderPlayers();
-        }
-
-        function nextPhase() {
+        }function nextPhase() {
             if (currentPhase === "night_sleep") {
                 currentPhase = "night_mafia";
                 if (playerRole === "Мафия" && players[0].isAlive) {
-                    document.getElementById('game-info').innerText = "Проснулась Мафия! Нажмите на бота, которого хотите убрать.";
+                    document.getElementById('game-info').innerText = "Проснулась Мафия! Выберите цель среди ботов.";
                     renderPlayers();
                 } else {
                     document.getElementById('game-info').innerText = "Мафия делает свой выбор... (Бот думает)";
@@ -592,7 +610,7 @@
             else if (currentPhase === "night_sheriff") {
                 currentPhase = "night_doctor";
                 if (playerRole === "Доктор" && players[0].isAlive) {
-                    document.getElementById('game-info').innerText = "Проснулся Доктор! Выберите, кого спасти в эту ночь.";
+                    document.getElementById('game-info').innerText = "Проснулся Доктор! Выберите, кого спасти.";
                     enableDoctorAction();
                 } else {
                     document.getElementById('game-info').innerText = "Доктор спасает жизни... (Бот думает)";
@@ -605,17 +623,15 @@
             } 
             else if (currentPhase === "day_chat") {
                 currentPhase = "day_vote";
-                document.getElementById('game-info').innerText = "Время голосования! Отдайте свой голос против одного из ботов.";
+                document.getElementById('game-info').innerText = "Время голосования! Кликните по подозреваемому боту.";
                 resetVotes();
             }
         }
 
         function selectMafiaTarget(id) {
             selectedTarget = id;
-            document.getElementById('game-info').innerText = `Вы выбрали убрать игрока ${players[id].name}. Нажмите кнопку пропуска для продолжения.`;
+            document.getElementById('game-info').innerText = `Вы выбрали убрать игрока ${players[id].name}. Нажмите кнопку пропуска хода.`;
         }
-
-        function strokeActionReset() { nextPhase(); }
 
         function enableSheriffAction() {
             players.forEach(p => {
@@ -624,7 +640,7 @@
                     if (card) {
                         card.classList.add('active-target');
                         card.onclick = () => {
-                            alert(`Проверка: Игрок ${p.name} — ${p.role === 'Мафия' ? 'Мафия 🥷' : 'Мирный гражданин 🤵'}`);
+                            alert(`Проверка Шерифа: Игрок ${p.name} — ${p.role === 'Мафия' ? 'Мафия 🥷' : 'Мирный гражданин 🤵'}`);
                             nextPhase();
                         };
                     }
@@ -676,9 +692,9 @@
                 message += `Этой ночью был убит: ${players[victimId].name}.`;
                 if (victimId === 0) isDead = true;
             } else if (victimId !== null && victimId === healedId) {
-                message += `Было покушение на ${players[victimId].name}, но Доктор спас его!`;
+                message += `Было покушение на ${players[victimId].name}, но Доктор вовремя спас его!`;
             } else {
-                message += "Ночь прошла спокойно.";
+                message += "Ночь прошла без происшествий.";
             }
 
             selectedTarget = null;
@@ -744,8 +760,8 @@
                 endGame("Мирные жители победили! Мафия устранена.");
                 return true;
             } else if (citizensAlive <= 1) {
-                endGame("Мафия победила! Город захвачен.");
-                return true;}
+                endGame("Мафия победила! Город захвачен преступниками.");return true;
+            }
             return false;
         }
 
@@ -769,7 +785,7 @@
 
         function continueAsSpectator() {
             document.getElementById('game-modal').style.display = "none";
-            document.getElementById('game-info').innerText = "Вы погибли, но продолжаете наблюдать за игрой ботов.";
+            document.getElementById('game-info').innerText = "Вы погибли, но продолжаете наблюдать за игрой ботов как призрак.";
             renderPlayers();
         }
     </script>
