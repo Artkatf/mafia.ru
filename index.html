@@ -4,9 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мафия - Настольная Игра</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #0d0d0d;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 1100px;
+            background: #141414;
+            border: 2px solid #bc1b1b;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 25px rgba(188, 27, 27, 0.25);
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #bc1b1b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            background: #bc1b1b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #ff2e2e;
+            box-shadow: 0 0 15px rgba(255, 46, 46, 0.6);
+        }
+
+        select, input[type="text"] {
+            background: #1f1f1f;
+            color: white;
+            border: 1px solid #bc1b1b;
+            padding: 12px;
+            border-radius: 6px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }.players-list {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .player-card {
+            background: #1a1a1a;
+            width: 18.5%;
+            padding: 20px 10px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(188, 27, 27, 0.3);
+            position: relative;
+            transition: 0.3s ease-in-out;
+        }
+
+        .player-card.active-target {
+            border-color: #ffcc00;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+        }
+
+        .player-card.dead {
+            opacity: 0.25;
+            background: #080808;
+            border-color: #333;
+        }
+
+        .avatar-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #242424;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            border: 3px solid #bc1b1b;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(188, 27, 27, 0.4);
+        }
+
+        .player-role {
+            font-size: 13px;
+            color: #ffcc00;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        .vote-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ffcc00;
+            color: black;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 13px;
+            display: none;
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
+        }
+
+        .menu-layout, .editor-layout {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .profile-preview, .editor-preview {
+            text-align: center;
+            width: 40%;
+            background: #141414;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px dashed #bc1b1b;
+        }
+
+        .menu-buttons, .editor-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 55%;
+        }
+
+        .option-group {
+            margin-bottom: 15px;
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #bc1b1b;
+        }
+
+        .option-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        .radio-set {
+            display: flex;
+            gap: 10px;
+        }
+
+        .radio-set label {
+            background: #242424;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 50%;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .radio-set input {
+            display: none;
+        }
+
+        .radio-set input:checked + label {
+            background: #bc1b1b;
+            color: white;
+            border-color: #ff2e2e;
+        }
+
+        .game-status {
+            background: #1a1a1a;
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            font-size: 18px;
+            border-left: 5px solid #bc1b1b;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: #141414;border: 2px solid #bc1b1b;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(188, 27, 27, 0.5);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+    </style>
+</head><body>
 
     <!-- ЭКРАН 1: ГЛАВНОЕ МЕНЮ -->
     <div id="screen-menu" class="screen active">
@@ -59,7 +295,9 @@
                         <option>Густая щетина</option>
                         <option>Бородка мафиози</option>
                     </select>
-                </div><div class="option-group">
+                </div>
+
+                <div class="option-group">
                     <label>Причёска (Любые 5):</label>
                     <select id="select-hair">
                         <option value="🤵">Зализ назад (Стиль 1)</option>
@@ -86,11 +324,10 @@
                 </div>
 
                 <div class="option-group">
-                    <label>Головные уборы и Одежда:</label>
-                    <select><option>Строгий Смокинг</option><option>Пальто в полоску</option><option>Кожаная куртка</option><option>Жилетка с галстуком</option></select>
+                    <label>Головные уборы и Одежда:</label><select><option>Строгий Смокинг</option><option>Пальто в полоску</option><option>Кожаная куртка</option><option>Жилетка с галстуком</option></select>
                 </div>
 
-                <button onclick="saveCharacter()" class="btn-save">Сохранить</button>
+                <button onclick="saveCharacter()" style="width:100%;">Сохранить</button>
             </div>
         </div>
     </div>
@@ -101,7 +338,7 @@
         <div class="mode-buttons">
             <button class="btn-disabled" disabled>Онлайн с игроками (Недоступно)</button>
             <button onclick="startOfflineGame()">Офлайн с ботами</button>
-            <button onclick="goToScreen('screen-menu')" class="btn-back">Назад</button>
+            <button onclick="goToScreen('screen-menu')" class="btn-back" style="background:#444;">Назад</button>
         </div>
     </div>
 
@@ -116,7 +353,7 @@
 
         <div class="game-controls">
             <button id="btn-action" onclick="gameActionButton()">Распределить роли</button>
-            <button id="btn-next-phase" onclick="nextPhase()">Пропустить ход/фазу</button>
+            <button id="btn-next-phase" style="display:none; background:#444;" onclick="nextPhase()">Пропустить ход/фазу</button>
         </div>
     </div>
 
@@ -130,262 +367,19 @@
                 <button onclick="continueAsSpectator()" id="btn-spectate">Смотреть остаток</button>
             </div>
         </div>
-    </div>* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Courier New', Courier, monospace;
-}
-
-body {
-    background-color: #0d0d0d;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-.screen {
-    display: none;
-    width: 100%;
-    max-width: 1100px;
-    background: #141414;
-    border: 2px solid #bc1b1b;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 0 25px rgba(188, 27, 27, 0.25);
-}
-
-.screen.active {
-    display: block;
-}
-
-h1, h2 {
-    text-align: center;
-    color: #bc1b1b;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 25px;
-}
-
-button {
-    background: #bc1b1b;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: 0.3s;
-    text-transform: uppercase;
-}
-
-button:hover {
-    background: #ff2e2e;
-    box-shadow: 0 0 15px rgba(255, 46, 46, 0.6);
-}
-
-select, input[type="text"] {
-    background: #1f1f1f;
-    color: white;
-    border: 1px solid #bc1b1b;
-    padding: 12px;
-    border-radius: 6px;
-    width: 100%;
-    font-size: 16px;
-    margin-bottom: 15px;
-}
-
-.players-list {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 35px;
-}
-
-.player-card {
-    background: #1a1a1a;
-    width: 18.5%;
-    padding: 20px 10px;
-    border-radius: 10px;
-    text-align: center;
-    border: 1px solid rgba(188, 27, 27, 0.3);
-    position: relative;
-    transition: 0.3s ease-in-out;
-}
-
-.player-card.active-target {
-    border-color: #ffcc00;
-    cursor: pointer;
-    box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
-}
-
-.player-card.dead {
-    opacity: 0.25;
-    background: #080808;
-    border-color: #333;
-}
-
-.avatar-circle {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: #242424;
-    margin: 0 auto 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 32px;
-    border: 3px solid #bc1b1b;
-    color: #fff;
-    box-shadow: 0 0 10px rgba(188, 27, 27, 0.4);
-}
-
-.player-role {
-    font-size: 13px;
-    color: #ffcc00;
-    margin-top: 8px;
-    font-weight: bold;
-}
-
-.vote-badge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: #ffcc00;
-    color: black;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 13px;
-    display: none;
-    box-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
-}
-
-.menu-layout, .editor-layout {
-    display: flex;
-    justify-content: space-between;
-    gap: 30px;
-}
-
-.profile-preview, .editor-preview {
-    text-align: center;
-    width: 40%;
-    background: #141414;
-    padding: 25px;
-    border-radius: 10px;
-    border: 1px dashed #bc1b1b;
-}
-
-.menu-buttons, .editor-options {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 55%;
-}
-
-.option-group {
-    margin-bottom: 15px;
-    background: #1a1a1a;
-    padding: 12px;
-    border-radius: 6px;
-    border-left: 3px solid #bc1b1b;
-}
-
-.option-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #ccc;
-}
-
-.radio-set {
-    display: flex;
-    gap: 10px;
-}
-
-.radio-set label {
-    background: #242424;
-    padding: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 50%;
-    text-align: center;
-    border: 1px solid #333;
-}
-
-.radio-set input {
-    display: none;
-}
-
-.radio-set input:checked + label {
-    background: #bc1b1b;
-    color: white;
-    border-color: #ff2e2e;
-}
-
-.game-status {
-    background: #1a1a1a;
-    padding: 15px;
-    text-align: center;
-    border-radius: 6px;
-    margin-bottom: 25px;
-    font-size: 18px;
-    border-left: 5px solid #bc1b1b;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;background: rgba(0, 0, 0, 0.9);
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-.modal-content {
-    background: #141414;
-    border: 2px solid #bc1b1b;
-    padding: 40px;
-    border-radius: 12px;
-    text-align: center;
-    max-width: 500px;
-    box-shadow: 0 0 30px rgba(188, 27, 27, 0.5);
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 25px;
-}<!-- Открываем тег скрипта для логики игры -->
-    <script>
-        // Данные игрока по умолчанию
+    </div><script>
         let playerConfig = { nickname: "Игрок", gender: "М", avatar: "🤵" };
-
-        // Состояние игры
         let players = [];
         let playerRole = "";
-        let currentPhase = "setup"; // Доступные фазы: setup, night_sleep, night_mafia, night_sheriff, night_doctor, day_chat, day_vote, game_over
+        let currentPhase = "setup";
         let selectedTarget = null;
         let isDead = false;
         let votes = {};
 
-        // Списки генерации ботов
         const botNames = ["Луиджи", "Бруно", "Дон Сальери", "Тони", "Вито", "Сэм", "Поли", "Фрэнк"];
         const botAvatars = ["🕵️‍♂️", "👨‍💼", "🤠", "🕶️", "🥸", "👴"];
         const rolesPool = ["Мафия", "Шериф", "Доктор", "Мирный житель", "Мирный житель"];
 
-        // Слушатель изменения прически для авто-обновления картинки в редакторе
         document.getElementById('select-hair').addEventListener('change', updateEditorAvatar);
 
         function goToScreen(screenId) {
@@ -398,7 +392,6 @@ select, input[type="text"] {
             document.getElementById('editor-avatar-view').innerText = hair;
         }
 
-        // Сохранение персонажа и возврат в главное меню
         function saveCharacter() {
             playerConfig.nickname = document.getElementById('input-nickname').value || "Игрок";
             playerConfig.gender = document.querySelector('input[name="gender"]:checked').value;
@@ -410,7 +403,6 @@ select, input[type="text"] {
             goToScreen('screen-menu');
         }
 
-        // Запуск игры офлайн
         function startOfflineGame() {
             goToScreen('screen-game');
             resetGame();
@@ -438,7 +430,6 @@ select, input[type="text"] {
         function getRandomBotName() { return botNames[Math.floor(Math.random() * botNames.length)]; }
         function getRandomBotAvatar() { return botAvatars[Math.floor(Math.random() * botAvatars.length)]; }
 
-        // Отрисовка карточек игроков на столе
         function renderPlayers() {
             const container = document.getElementById('players-container');
             if (!container) return;
@@ -447,14 +438,15 @@ select, input[type="text"] {
             players.forEach((p) => {
                 let card = document.createElement('div');
                 card.className = `player-card ${p.isAlive ? '' : 'dead'}`;
-                card.id = `player-${p.id}`;let roleText = "Роль: ?";
+                card.id = `player-${p.id}`;
+                
+                let roleText = "Роль: ?";
                 if (!p.isBot && p.role) roleText = `Роль: ${p.role}`;
                 if (currentPhase === "game_over" || (!p.isAlive && p.isBot)) roleText = `Роль: ${p.role}`;
 
                 card.innerHTML = `
                     <div class="vote-badge" id="badge-${p.id}">0</div>
-                    <div class="avatar-circle" style="width:70px; height:70px; font-size:24px;">${p.avatar}</div>
-                    <div style="font-weight:bold; font-size:14px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${p.name} ${p.id === 0 ? '(Вы)' : ''}</div>
+                    <div class="avatar-circle" style="width:70px; height:70px; font-size:24px;">${p.avatar}</div><div style="font-weight:bold; font-size:14px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${p.name} ${p.id === 0 ? '(Вы)' : ''}</div>
                     <div class="player-role">${roleText}</div>
                 `;
 
@@ -476,7 +468,6 @@ select, input[type="text"] {
             }
         }
 
-        // Случайное перемешивание и распределение ролей
         function shuffleRoles() {
             let pool = [...rolesPool];
             for (let i = pool.length - 1; i > 0; i--) {
@@ -485,7 +476,7 @@ select, input[type="text"] {
             }
             
             players.forEach((p, i) => { p.role = pool[i]; });
-            playerRole = players[0].role; // Фикс: берем роль живого игрока под индексом 0
+            playerRole = players[0].role;
 
             document.getElementById('btn-action').style.display = "none";
             document.getElementById('btn-next-phase').style.display = "inline-block";
@@ -497,8 +488,7 @@ select, input[type="text"] {
             currentPhase = "night_sleep";
             document.getElementById('game-info').innerText = "Город засыпает... Нажмите кнопку пропуска фазы, чтобы проснулась Мафия.";
             renderPlayers();
-        }// Переключение между ночными фазами по шагам
-        function nextPhase() {
+        }function nextPhase() {
             if (currentPhase === "night_sleep") {
                 currentPhase = "night_mafia";
                 if (playerRole === "Мафия" && players[0].isAlive) {
@@ -576,8 +566,7 @@ select, input[type="text"] {
                     }
                 }
             });
-        }// Расчет итогов ночи
-        function processNightResults() {
+        }function processNightResults() {
             let victimId = null; 
             
             if (playerRole === "Мафия" && players[0].isAlive) {
@@ -629,7 +618,6 @@ select, input[type="text"] {
             renderPlayers();
         }
 
-        // Игрок делает выбор на голосовании
         function selectVoteTarget(botId) {
             resetVotes();
             votes[botId] = 1;
@@ -675,8 +663,9 @@ select, input[type="text"] {
 
         function checkWinConditions() {
             let mafiaAlive = players.some(p => p.role === "Мафия" && p.isAlive);
-            let citizensAlive = players.filter(p => p.role !== "Мафия" && p.isAlive).length;if (!mafiaAlive) {
-                endGame("Мирные жители победили! Мафия полностью устранена.");
+            let citizensAlive = players.filter(p => p.role !== "Мафия" && p.isAlive).length;
+
+            if (!mafiaAlive) {endGame("Мирные жители победили! Мафия полностью устранена.");
                 return true;
             } else if (citizensAlive <= 1) {
                 endGame("Мафия победила! Город остался под ее контролем.");
